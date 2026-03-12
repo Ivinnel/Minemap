@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MineMap - выживание на реальной карте Земли</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Minecraft', 'Segoe UI', Arial, sans-serif;
+            background: #1a1a1a;
+            color: #fff;
+            line-height: 1.6;
+        }
+
+        @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+
+        .minecraft-font {
+            font-family: 'Press Start 2P', cursive;
+        }
+
+        .header {
+            background: url('image (7).jpg');
+            background-size: cover;
+            background-position: center;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .header h1 {
+            font-size: 4rem;
+            margin-bottom: 20px;
+            text-shadow: 4px 4px 0 #3f3f3f;
+            color: #4caf50;
+        }
+
+        .server-ip {
+            background: #2d2d2d;
+            padding: 20px 40px;
+            border-radius: 10px;
+            margin: 30px 0;
+            border: 3px solid #4caf50;
+            font-size: 2rem;
+            cursor: pointer;
+            transition: transform 0.3s;
+        }
+
+        .server-ip:hover {
+            transform: scale(1.05);
+            background: #3d3d3d;
+        }
+
+        .section {
+            padding: 80px 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .section-title {
+            font-size: 2.5rem;
+            margin-bottom: 50px;
+            text-align: center;
+            color: #4caf50;
+            text-shadow: 3px 3px 0 #2d2d2d;
+        }
+
+        .info-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin-top: 40px;
+        }
+
+        .card {
+            background: #2d2d2d;
+            padding: 30px;
+            border-radius: 15px;
+            border-left: 5px solid #4caf50;
+            transition: transform 0.3s;
+        }
+
+        .card:hover {
+            transform: translateY(-10px);
+        }
+
+        .card h3 {
+            color: #4caf50;
+            margin-bottom: 15px;
+            font-size: 1.5rem;
+        }
+
+        .features-list {
+            list-style: none;
+        }
+
+        .features-list li {
+            margin: 15px 0;
+            padding-left: 30px;
+            position: relative;
+        }
+
+        .features-list li:before {
+            content: "▶";
+            color: #4caf50;
+            position: absolute;
+            left: 0;
+        }
+
+        .application-form {
+            background: #2d2d2d;
+            padding: 50px;
+            border-radius: 20px;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #4caf50;
+            font-weight: bold;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 15px;
+            background: #3d3d3d;
+            border: 2px solid #4caf50;
+            border-radius: 8px;
+            color: #fff;
+            font-size: 1rem;
+        }
+
+        .form-group textarea {
+            height: 150px;
+            resize: vertical;
+        }
+
+        .submit-btn {
+            background: #4caf50;
+            color: #fff;
+            padding: 15px 40px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: background 0.3s;
+            width: 100%;
+            font-weight: bold;
+        }
+
+        .submit-btn:hover {
+            background: #45a049;
+        }
+
+        .stats {
+            display: flex;
+            justify-content: center;
+            gap: 50px;
+            margin: 50px 0;
+            flex-wrap: wrap;
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 3rem;
+            color: #4caf50;
+            font-weight: bold;
+        }
+
+        .stat-label {
+            font-size: 1rem;
+            color: #888;
+        }
+
+        .footer {
+            background: #0a0a0a;
+            padding: 40px 20px;
+            text-align: center;
+            border-top: 3px solid #4caf50;
+        }
+
+        .social-links {
+            margin: 20px 0;
+        }
+
+        .social-links a {
+            color: #fff;
+            text-decoration: none;
+            margin: 0 15px;
+            font-size: 1.2rem;
+        }
+
+        .social-links a:hover {
+            color: #4caf50;
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .server-ip {
+                font-size: 1.2rem;
+                padding: 15px 20px;
+            }
+            
+            .section {
+                padding: 40px 15px;
+            }
+        }
+
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #4caf50;
+            color: #fff;
+            padding: 15px 25px;
+            border-radius: 8px;
+            display: none;
+            animation: slideIn 0.5s;
+            z-index: 1000;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        .radio-group {
+            display: flex;
+            gap: 30px;
+            margin-top: 10px;
+        }
+
+        .radio-option {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .radio-option input[type="radio"] {
+            width: auto;
+            margin: 0;
+        }
+    </style>
+</head>
+<body>
+    <!-- Шапка сайта -->
+    <header class="header">
+        <h1>⚡ MINEMAP ⚡</h1>
+        
+        <div class="server-ip" onclick="copyIP()">
+            ИГРАТЬ
+        </div>
+        
+        <a href="#apply" style="background: #4caf50; color: #fff; padding: 15px 30px; text-decoration: none; border-radius: 8px; font-weight: bold;">
+            ПОДАТЬ ЗАЯВКУ
+        </a>
+    </header>
+
+    <!-- Статистика -->
+    <div class="stats">
+        <div class="stat-item">
+            <div class="stat-number">24/7</div>
+            <div class="stat-label">Работа сервера</div>
+        </div>
+        <div class="stat-item">
+            <div class="stat-number">1.21</div>
+            <div class="stat-label">Версия</div>
+        </div>
+        <div class="stat-item">
+            <div class="stat-number">🌍</div>
+            <div class="stat-label">Реальная карта Земли</div>
+        </div>
+    </div>
+
+    <!-- Информация о сервере -->
+    <section class="section">
+        <h2 class="section-title">📋 О СЕРВЕРЕ</h2>
+        
+        <div class="info-cards">
+            <div class="card">
+                <h3>🌍 ОСОБЕННОСТИ</h3>
+                <ul class="features-list">
+                    <li>Античит защита</li>
+                    <li>Политика сервера</li>
+                    <li>Карта мира - реальная Земля</li>
+                </ul>
+            </div>
+            
+            <div class="card">
+                <h3>⚙️ ОПИСАНИЕ</h3>
+                <ul class="features-list">
+                    <li>Чистое выживание на карте Земли</li>
+                    <li>Земля пустая - строим всё сами</li>
+                    <li>Свободное развитие своих земель</li>
+                    <li>Реалистичный мир</li>
+                </ul>
+            </div>
+        </div>
+    </section>
+
+    <!-- Правила сервера -->
+    <section class="section" style="background: #222;">
+        <h2 class="section-title">📜 ПРАВИЛА</h2>
+        
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px;">
+            <div class="card" style="border-left-color: #ff5722;">
+                <h3>🚫 ЗАПРЕЩЕНО</h3>
+                <ul class="features-list">
+                    <li>Читерство и использование модов</li>
+                    <li>Гриферство</li>
+                    <li>Оскорбления игроков</li>
+                    <li>Спам в чате</li>
+                </ul>
+            </div>
+            
+            <div class="card" style="border-left-color: #4caf50;">
+                <h3>✅ РАЗРЕШЕНО</h3>
+                <ul class="features-list">
+                    <li>PvP</li>
+                    <li>Торговля</li>
+                    <li>Строительство</li>
+                    <li>Исследование мира</li>
+                </ul>
+            </div>
+        </div>
+    </section>
+
+    <!-- Форма заявки -->
+    <section id="apply" class="section">
+        <h2 class="section-title">📝 ЗАЯВКА НА ВСТУПЛЕНИЕ</h2>
+        
+        <form class="application-form" id="applicationForm" action="https://formspree.io/f/xjgaryea" method="POST">
+            <div class="form-group">
+                <label>Никнейм в Minecraft *</label>
+                <input type="text" id="minecraftName" required placeholder="Введите ваш ник">
+            </div>
+            
+            <div class="form-group">
+                <label>Возраст *</label>
+                <input type="number" id="age" required min="5" max="99" placeholder="Ваш возраст">
+            </div>
+            
+            <div class="form-group">
+                <label>Email для связи *</label>
+                <input type="email" id="email" required placeholder="your@email.com">
+            </div>
+            
+            <div class="form-group">
+                <label>Способ связи (выберите один) *</label>
+                <div class="radio-group">
+                    <div class="radio-option">
+                        <input type="radio" id="contactDiscord" name="contactMethod" value="discord" required>
+                        <label for="contactDiscord">Discord</label>
+                    </div>
+                    <div class="radio-option">
+                        <input type="radio" id="contactTelegram" name="contactMethod" value="telegram" required>
+                        <label for="contactTelegram">Telegram</label>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label>Ваш ник в Discord или Telegram *</label>
+                <input type="text" id="contactNick" required placeholder="Введите ваш ник">
+            </div>
+            
+            <div class="form-group">
+                <label>Почему вы хотите играть у нас? *</label>
+                <textarea id="reason" required placeholder="Расскажите о себе и почему хотите играть на нашем сервере..."></textarea>
+            </div>
+            
+            <div class="form-group">
+                <label>Согласны ли вы с правилами сервера? *</label>
+                <select id="rulesAgree" required>
+                    <option value="">Выберите ответ</option>
+                    <option value="yes">Да, согласен</option>
+                    <option value="no">Нет, не согласен</option>
+                </select>
+            </div>
+            
+            <button type="submit" class="submit-btn">ОТПРАВИТЬ ЗАЯВКУ</button>
+        </form>
+    </section>
+
+    <!-- Контакты -->
+    <section class="section" style="background: #222;">
+        <h2 class="section-title">📞 КОНТАКТЫ</h2>
+        
+        <div style="text-align: center;">
+            <p style="margin: 20px 0;">Telegram: t.me/Ivinnel</p>
+            <p style="margin: 20px 0;">Twitch: https://www.twitch.tv/iv1nnel</p>
+        </div>
+    </section>
+
+    <!-- Подвал -->
+    <footer class="footer">
+        <p>© 2024 MineMap. Все права защищены.</p>
+        <p>Неофициальный фанатский проект. Minecraft является торговой маркой Mojang Studios.</p>
+    </footer>
+
+    <!-- Уведомление -->
+    <div class="notification" id="notification">
+        IP адрес скопирован!
+    </div>
+
+    <script>
+        // Копирование IP
+        function copyIP() {
+            const ip = "play.minemap.ru";
+            navigator.clipboard.writeText(ip).then(() => {
+                const notification = document.getElementById('notification');
+                notification.style.display = 'block';
+                setTimeout(() => {
+                    notification.style.display = 'none';
+                }, 3000);
+            });
+        }
+
+            // Проверка согласия с правилами
+            if (formData.rulesAgree !== 'yes') {
+                alert('Вы должны согласиться с правилами сервера!');
+                return;
+            }
+
+            // Проверка выбора способа связи
+            if (!formData.contactMethod) {
+                alert('Выберите способ связи!');
+                return;
+            }
+
+            // Отправка данных (здесь нужно подключить бэкенд)
+            console.log('Отправка заявки:', formData);
+            
+            // Показываем сообщение об успешной отправке
+            alert('Заявка успешно отправлена! Мы свяжемся с вами в ближайшее время.');
+            
+            // Очищаем форму
+            this.reset();
+        });
+
+        // Плавная прокрутка к разделам
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                document.querySelector(this.getAttribute('href')).scrollIntoView({
+                    behavior: 'smooth'
+                });
+            });
+        });
+    </script>
+</body>
+</html>
